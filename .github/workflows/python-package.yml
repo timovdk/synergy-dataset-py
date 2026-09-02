@@ -6,7 +6,10 @@ on: [push, pull_request]
 
 jobs:
   cache-datasets:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v7
     - name: Set up Python
@@ -60,11 +63,18 @@ jobs:
   build:
     needs: cache-datasets
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
+        os: [ubuntu-latest, windows-latest]
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        exclude:
+          - os: windows-latest
+            python-version: "3.11"
+          - os: windows-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.13"
 
     steps:
     - uses: actions/checkout@v7
